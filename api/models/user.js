@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
-    usename: {
+    username: {
         type: String,
         required: true,
         unique: true,
@@ -19,11 +19,13 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
+        lowercase: true,
         maxLength: 50,
     },
     lastName: {
         type: String,
         required: true,
+        lowercase: true,
         maxLength: 50,
     }
 }, {timestamps: true})
@@ -41,4 +43,18 @@ userSchema.methods.matchPassword = async function (givenPassword) {
 
 const userModel = mongoose.model('Paytm_user', userSchema);
 
-module.exports = userModel;
+const accountSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Paytm_user',
+        required: true,
+    },
+    balance: {
+        type: Number,
+        required: true,
+    }
+})
+
+const accountModel = mongoose.model('paytm_account', accountSchema);
+
+module.exports = { userModel, accountModel };

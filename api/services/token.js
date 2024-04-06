@@ -6,7 +6,7 @@ const setUser = (res, id) => {
 }
 
 const getUser = (jwtCookie) => {
-    if(!id) return null;
+    if(!jwtCookie) return null;
     try {
         const data = jwt.verify(jwtCookie, process.env.JWT_SECRET);
         return data.userId;
