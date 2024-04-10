@@ -13,10 +13,10 @@ const signup = async (req, res) => {
         if(findUser) return res.status(303).json({msg: "User already exists!"});
         const user = await userModel.create({username, password, firstName, lastName});
         const balance = Math.floor((Math.random()*10000 + 1) * 100);
-        const account = await accountModel.create({userId:user._id, balance})
+        await accountModel.create({userId:user._id, balance})
         if(user) {
             setUser(res, user._id);
-            return res.status(200).json({userId: user._id});
+            return res.status(200).json({id: user._id, username: user.username, firstName: user.firstName, lastName: user.lastName});
         }
         else {
             return res.status(400).json({msg: "Something went wrong!"});
@@ -37,9 +37,9 @@ const signin = async (req, res) => {
         const user = await userModel.findOne({username});
         if(user && user.matchPassword(password)) {
             setUser(res, user._id);
-            return res.status(200).json({msg: "LoggedIn !"});
+            return res.status(200).json({id: user._id, username: user.username, firstName: user.firstName, lastName: user.lastName});
         } else {
-            return res.status(200).json({msg: "Incorrect username or password !"});
+            return res.status(303).json({msg: "Incorrect username or password !"});
         }
     } catch (error) {
         
@@ -70,11 +70,11 @@ const getUsers = async (req, res) => {
     const filter = req.query?.filter || "";
     const user = await userModel.find({
         $or: [{firstName: {
-                "$regex": filter.toLowerCase()
+                "$regex": filter.trim().toLowerCase()
                 } 
             },
             {lastName: {
-                "$regex": filter.toLowerCase()
+                "$regex": filter.trim().toLowerCase()
                 }
             }]
     });
